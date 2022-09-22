@@ -1,0 +1,119 @@
+# This file contains the fastlane.tools configuration
+# You can find the documentation at https://docs.fastlane.tools
+#
+# For a list of all available actions, check out
+#
+#     https://docs.fastlane.tools/actions
+#
+# For a list of all available plugins, check out
+#
+#     https://docs.fastlane.tools/plugins/available-plugins
+#
+
+# Uncomment the line if you want fastlane to automatically update itself
+# update_fastlane
+
+default_platform(:ios)
+
+platform :ios do
+  desc "Build Sample App"
+  lane :build do
+    clear_derived_data
+    cocoapods(clean_install: true, repo_update: true)
+    xcodebuild(
+      scheme: "YandexPayExample",
+      xcargs: "-configuration Release -sdk 'iphonesimulator' -destination 'generic/platform=iOS Simulator'",
+    )
+  end
+
+  desc "Update project configuration with mobile provisioning for adhoc distribution"
+  private_lane :update_mobile_provision do
+    proj_path = File.expand_path("../YandexPayExample.xcodeproj")
+    UI.success("Going to update project '#{proj_path}' with mobile provisioning for adhoc distribution.")
+    project = Xcodeproj::Project.open(proj_path)
+
+    targets_names = ["YandexPayExample"]
+    targets = project.targets.select { |target| targets_names.include? target.name }
+
+    targets.each do |target|
+      UI.success("Updating target #{target.name}...")
+      target.build_configuration_list.build_configurations.each do |build_configuration|
+        build_configuration.build_settings["CODE_SIGN_IDENTITY"] = "iPhone Distribution"
+        build_configuration.build_settings["DEVELOPMENT_TEAM"] = "EK7Z26L6D4" # (Enterprise) Yandex LLC - EK7Z26L6D4
+        build_configuration.build_settings["PROVISIONING_PROFILE_SPECIFIER"] = "Yandex Pay React Native Sample"
+      end
+      UI.success("Updated!")
+    end
+
+    project.save
+  end
+
+  desc "Build SampleApp"
+  private_lane :assemble_ipa do |options|
+    output_name = "#{options[:scheme]}.#{options[:build_configuration]}.version-#{options[:sdk_version]}.build-#{options[:build_number]}.ipa"
+    provisioningProfiles = { "com.yandex.reactnativeyandexpay": "Yandex Pay React Native Sample" }
+
+    export_options = {
+      compileBitcode: false,
+      uploadBitcode: false,
+      provisioningProfiles: provisioningProfiles,
+    }
+
+    clear_derived_data
+    cocoapods(clean_install: true, repo_update: true)
+    gym(
+      scheme: options[:scheme],
+      configuration: options[:build_configuration],
+      export_method: "enterprise",
+      codesigning_identity: "iPhone Distribution: Yandex LLC",
+      export_options: export_options,
+      output_name: output_name,
+      silent: false,
+      output_directory: "output",
+      archive_path: "archive",
+      build_path: "build",
+      xcargs: "-verbose",
+      clean: true,
+    )
+  end
+
+  desc "Upload to beta"
+  private_lane :upload_to_beta do |options|
+    ybeta(
+      platform: "iphone",
+      project_name: options[:beta_app_name],
+      bundle_id: "com.yandex.reactnativeyandexpay",
+      version: options[:sdk_version],
+      build: options[:build_number],
+      branch: get_ybeta_branch(options[:branch_name]) + options[:beta_branch_suffix],
+    )
+  end
+
+  desc "Build Sample App and upload it to beta"
+  lane :beta do |options|
+    options[:scheme] = options[:scheme] || "YandexPayExample"
+    options[:sdk_version] = options[:sdk_version] || "1.0"
+    options[:build_number] = options[:build_number] || ENV["BUILD_NUMBER"]
+    options[:branch_name] = options[:branch_name] || ENV["BUILD_BRANCH"]
+    options[:beta_app_name] = options[:beta_app_name] || "ypay"
+    options[:build_configuration] = options[:build_configuration] || "Release"
+    options[:beta_branch_suffix] = options[:beta_branch_suffix] || "-react-native"
+
+    update_mobile_provision
+    assemble_ipa options
+    upload_to_beta options
+    File.open("../beta_upload_links.md", "a") { |f| f << "#{options[:build_configuration]} - #{lane_context[SharedValues::BETA_DOWNLOAD_URL]}\n" }
+  end
+end
+
+def get_ybeta_branch(branch)
+  branch = branch.clone
+  return "PR#{branch.split("/")[-2]}" if branch.end_with?("/merge_pin")
+
+  branch = branch.sub(/^arcadia\//, "")
+  if branch.start_with?(RELEASE_BRANCH_PREFIX)
+    return branch.slice(RELEASE_BRANCH_PREFIX.length..-1)
+  end
+
+  return branch.gsub(/\//, "_")
+end
