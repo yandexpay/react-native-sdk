@@ -1,6 +1,6 @@
 {
-  "name": "react-native-yandex-pay-example",
-  "description": "Example app for react-native-yandex-pay",
+  "name": "@yandex-pay/react-native-sdk-example",
+  "description": "Example app for @yandex-pay/react-native-sdk",
   "version": "0.0.1",
   "private": true,
   "scripts": {

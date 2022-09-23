@@ -13,7 +13,7 @@ import {
   YandexPay,
   YandexPayCheckoutButton,
   CurrencyCode,
-} from 'react-native-yandex-pay';
+} from '@yandex-pay/react-native-sdk';
 
 const LOGO_URL = 'https://yastatic.net/s3/pay-static/icons/yandex-pay.svg';
 

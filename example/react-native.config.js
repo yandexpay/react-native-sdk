@@ -2,7 +2,7 @@ const path = require('path');
 
 module.exports = {
   dependencies: {
-    'react-native-yandex-pay': {
+    '@yandex-pay/react-native-sdk': {
       root: path.join(__dirname, '..'),
     },
   },

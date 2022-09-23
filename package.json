@@ -1,5 +1,5 @@
 {
-  "name": "react-native-yandex-pay",
+  "name": "@yandex-pay/react-native-sdk",
   "version": "0.1.0",
   "description": "Yandex Pay React Native sdk",
   "main": "lib/commonjs/index",
@@ -13,7 +13,7 @@
     "android",
     "ios",
     "cpp",
-    "react-native-yandex-pay.podspec",
+    "yandex-pay-react-native-sdk.podspec",
     "!lib/typescript/example",
     "!android/build",
     "!ios/build",

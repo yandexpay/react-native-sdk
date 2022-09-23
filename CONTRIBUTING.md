@@ -51,7 +51,7 @@ Remember to add tests for your change if possible. Run the unit tests by:
 ```sh
 yarn test
 ```
-To edit the Objective-C files, open `example/ios/YandexPayExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > react-native-yandex-pay`.
+To edit the Objective-C files, open `example/ios/YandexPayExample.xcworkspace` in XCode and find the source files at `Pods > Development Pods > yandex-pay-react-native-sdk`.
 
 To edit the Kotlin files, open `example/android` in Android studio and find the source files at `reactnativeyandexpay` under `Android`.
 ### Commit message convention

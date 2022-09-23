@@ -1,9 +1,9 @@
-# react-native-yandex-pay
+# @yandex-pay/react-native-sdk
 
 ## Установка
 
 ```sh
-npm install react-native-yandex-pay
+npm install @yandex-pay/react-native-sdk
 ```
 
 ### iOS
@@ -51,7 +51,7 @@ npm install react-native-yandex-pay
 ### Инициализация СДК :
 
 ```js
-import { YandexPay } from 'react-native-yandex-pay';
+import { YandexPay } from '@yandex-pay/react-native-sdk';
 
 // Убедитесь, что сдк YandexPay инициализирована только один раз за время жизни приложения
 export default function App() {
@@ -74,7 +74,7 @@ export default function App() {
 ### Установка кнопки YandexPay:
 
 ```js
-import { YandexPayCheckoutButton, CurrencyCode } from 'react-native-yandex-pay';
+import { YandexPayCheckoutButton, CurrencyCode } from '@yandex-pay/react-native-sdk';
 
 const paymentSheet = {
   currencyCode: CurrencyCode.Rub,
@@ -93,7 +93,7 @@ const paymentSheet = {
   metadata: 'metadata',
 }
 
-return <YandexPayCheckoutButton 
+return <YandexPayCheckoutButton
   theme='dark'
   paymentSheet={paymentSheet}
   onCheckoutSuccess={(result) => {
