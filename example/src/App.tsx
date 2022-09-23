@@ -2,6 +2,7 @@ import React from 'react';
 
 import {
   StyleSheet,
+  ScrollView,
   View,
   Text,
   Alert,
@@ -10,12 +11,13 @@ import {
   Image,
 } from 'react-native';
 import {
+  InitConfiguration,
   YandexPay,
   YandexPayCheckoutButton,
   CurrencyCode,
 } from '@yandex-pay/react-native-sdk';
 
-const LOGO_URL = 'https://yastatic.net/s3/pay-static/icons/yandex-pay.svg';
+const LOGO_URL = 'https://yastatic.net/s3/pay-static/icons/yandex-pay.png';
 
 const DEFAULT_INITIAL_DATA = `{
   "merchant": {
@@ -42,7 +44,7 @@ const DEFAULT_PAYMENT_SHEET = `{
   "metadata": "metadata"
 }`;
 
-function text2json(text: string): any | null {
+function text2json<T = Record<string, string>>(text: string): null | T {
   try {
     const data = JSON.parse(text);
 
@@ -64,7 +66,7 @@ export default function App() {
   const [initialStatus, setInitialStatus] = React.useState('');
 
   const initialData = React.useMemo(
-    () => text2json(initialDataText),
+    () => text2json<InitConfiguration>(initialDataText),
     [initialDataText]
   );
   const paymentSheet = React.useMemo(
@@ -78,114 +80,135 @@ export default function App() {
       return;
     }
 
+    if (!initialData) {
+      setInitialStatus('Invalid initial data');
+      return;
+    }
+
     YandexPay.initialize(initialData).then(
       () => setInitialStatus('success'),
-      (err) => setInitialStatus(err.toString())
+      (err: any) => setInitialStatus(err.toString())
     );
   }, [stage, initialData, setInitialStatus]);
 
   if (stage === 'edit') {
     return (
-      <View style={styles.container}>
-        <View style={styles.containerCenter}>
-          <Image style={styles.logo} source={LOGO_URL} />
+      <ScrollView style={styles.container}>
+        <View style={styles.containerLogo}>
+          <Image style={styles.logo} source={{ uri: LOGO_URL }} />
         </View>
-        <Text style={styles.label}>Initialize data</Text>
-        <TextInput
-          multiline
-          style={{ ...styles.input, height: 130 }}
-          onChangeText={(text) => setInitialDataText(text)}
-          value={initialDataText}
-        />
-        <Text style={styles.inputError}>
-          {initialData ? '' : 'Invalid initialize data'}
-        </Text>
-        <Text style={styles.label}>Payment sheet</Text>
-        <TextInput
-          multiline
-          style={{ ...styles.input, height: 300 }}
-          onChangeText={(text) => setPaymentSheetText(text)}
-          value={paymentSheetText}
-        />
-        <Text style={styles.inputError}>
-          {paymentSheet ? '' : 'Invalid payment sheet'}
-        </Text>
+        <View style={styles.containerMain}>
+          <Text style={styles.fieldLabel}>Initialize data</Text>
+          <TextInput
+            multiline
+            style={{ ...styles.fieldInput, height: 130 }}
+            onChangeText={(text) => setInitialDataText(text)}
+            value={initialDataText}
+          />
+          <Text style={styles.fieldLabel}>
+            {initialData ? '' : 'Invalid initialize data'}
+          </Text>
+          <Text style={styles.fieldLabel}>Payment sheet</Text>
+          <TextInput
+            multiline
+            style={{ ...styles.fieldInput, height: 300 }}
+            onChangeText={(text) => setPaymentSheetText(text)}
+            value={paymentSheetText}
+          />
+          <Text style={styles.fieldLabel}>
+            {paymentSheet ? '' : 'Invalid payment sheet'}
+          </Text>
 
-        <Button
-          title="Show Yandex Pay"
-          disabled={!(paymentSheet && initialData)}
-          onPress={() => setStage('yandex-pay')}
-        />
-      </View>
+          <Button
+            title="Show Yandex Pay"
+            disabled={!(paymentSheet && initialData)}
+            onPress={() => setStage('yandex-pay')}
+          />
+        </View>
+      </ScrollView>
     );
   }
 
   return (
-    <View style={styles.container}>
-      <View style={styles.containerCenter}>
-        <Image style={styles.logo} source={LOGO_URL} />
+    <ScrollView style={styles.container}>
+      <View style={styles.containerLogo}>
+        <Image style={styles.logo} source={{ uri: LOGO_URL }} />
       </View>
-      <Text style={{ marginVertical: 20 }}>
-        Initialization: {initialStatus}
-      </Text>
-      <View style={styles.containerYandexPay}>
-        {initialStatus === 'success' && (
-          <YandexPayCheckoutButton
-            theme="dark"
-            paymentSheet={paymentSheet}
-            onCheckoutSuccess={(result) => {
-              Alert.alert(
-                'Success!',
-                `Checkout finished successfully - <${JSON.stringify(result)}>`
-              );
-            }}
-            onCheckoutAbort={() => {
-              Alert.alert('Cancelled!', 'Checkout has been cancelled by user');
-            }}
-            onCheckoutError={(error) => {
-              Alert.alert(
-                'Error!',
-                `Checkout finished with error - <${JSON.stringify(error)}>`
-              );
-            }}
-            style={styles.button}
-          />
-        )}
+      <View style={styles.containerMain}>
+        <View style={styles.containerButton}>
+          <Text style={styles.status}>Initialization: {initialStatus}</Text>
+          {initialStatus === 'success' && (
+            <YandexPayCheckoutButton
+              theme="dark"
+              paymentSheet={paymentSheet}
+              onCheckoutSuccess={(result: any) => {
+                Alert.alert(
+                  'Success!',
+                  `Checkout finished successfully - <${JSON.stringify(result)}>`
+                );
+              }}
+              onCheckoutAbort={() => {
+                Alert.alert(
+                  'Cancelled!',
+                  'Checkout has been cancelled by user'
+                );
+              }}
+              onCheckoutError={(error: any) => {
+                Alert.alert(
+                  'Error!',
+                  `Checkout finished with error - <${JSON.stringify(error)}>`
+                );
+              }}
+              style={styles.button}
+            />
+          )}
+        </View>
+        <Button title="Back to edit" onPress={() => setStage('edit')} />
       </View>
-
-      <Button title="Back to edit" onPress={() => setStage('edit')} />
-    </View>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
   container: {
-    padding: '20px',
-  },
-  containerCenter: {
+    padding: 20,
     flex: 1,
+    justifyContent: 'flex-start',
+    backgroundColor: 'white',
+  },
+  containerLogo: {
+    marginTop: 50,
+    marginBottom: 20,
+    height: 50,
     alignItems: 'center',
   },
   logo: {
     width: 123,
-    height: 42,
+    height: 50,
     marginBottom: 20,
   },
-  label: {
+  containerMain: {
+    flex: 1,
+  },
+  fieldLabel: {
     fontWeight: '500',
   },
-  input: {
+  fieldInput: {
     height: 100,
     margin: 0,
     borderWidth: 1,
     padding: 5,
   },
-  inputError: {
+  fieldError: {
     marginBottom: 10,
     color: 'red',
   },
-  containerYandexPay: {
+  containerButton: {
     marginBottom: 20,
+    alignItems: 'center',
+  },
+  status: {
+    marginBottom: 10,
   },
   button: {
     width: 300,
