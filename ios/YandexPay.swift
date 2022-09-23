@@ -24,7 +24,7 @@ class YandexPayCheckoutButtonViewManager: RCTViewManager {
             "DefaultHeight" : 54.0,
         ]
     }
-    
+
   override func view() -> UIView! {
       let view = YandexPayCheckoutButtonView()
       let theme = view.theme.toSDK.toTheme
@@ -41,10 +41,10 @@ class YandexPayCheckoutButtonViewManager: RCTViewManager {
 
 class YandexPayCheckoutButtonView: UIView, YandexPayCheckoutButtonDelegate {
     private var payButton: YandexPayButton!
-    
+
     var theme: ButtonTheme = .dark {
         didSet {
-            guard theme != oldValue else { return }
+//             guard theme != oldValue else { return }
             payButton.setTheme(theme.toSDK.toTheme, animated: false)
         }
     }
@@ -52,14 +52,14 @@ class YandexPayCheckoutButtonView: UIView, YandexPayCheckoutButtonDelegate {
         set { self.theme = ButtonTheme(rawValue: newValue) ?? .dark }
         get { self.theme.rawValue }
     }
-    
+
     var paymentSheet: PaymentSheet?
     @objc(paymentSheet) var _paymentSheet: [String: Any]? {
         didSet {
             self.paymentSheet = try? parseReactJson(PaymentSheet.self, from: _paymentSheet!)
         }
     }
-    
+
     @objc var onCheckoutSuccess: RCTDirectEventBlock?
     @objc var onCheckoutAbort: RCTDirectEventBlock?
     @objc var onCheckoutError: RCTDirectEventBlock?
@@ -67,24 +67,24 @@ class YandexPayCheckoutButtonView: UIView, YandexPayCheckoutButtonDelegate {
     override init(frame:CGRect) {
       super.init(frame: frame)
     }
-    
+
     required init?(coder aDecoder: NSCoder) {
       fatalError("init(coder:) has not been implemented")
     }
-    
+
     convenience init() {
         self.init(frame: .zero)
     }
-    
+
     func attach(payButton: YandexPayButton) {
         self.payButton = payButton
         self.addSubview(payButton)
-        
+
         // Match parent size
         payButton.autoresizingMask = [.flexibleWidth, .flexibleHeight]
         payButton.frame = bounds
     }
-    
+
     func yandexPayCheckoutButton(_ button: YandexPayButton, didCompletePaymentWithResult result: YPCheckoutResult) {
         switch result {
         case .succeeded(let result):
@@ -95,11 +95,11 @@ class YandexPayCheckoutButtonView: UIView, YandexPayCheckoutButtonDelegate {
             onCheckoutError?(try? encodeReactJson(error.toJS))
         }
     }
-    
+
     func yandexPayCheckoutButtonDidRequestViewControllerForPresentation(_ button: YandexPayButton) -> UIViewController? {
         return UIApplication.shared.keyWindow?.topViewController()
     }
-    
+
     func yandexPayCheckoutButtonDidRequestPaymentSheet(_ button: YandexPayButton) -> YPCheckoutPaymentSheet? {
         return paymentSheet?.toSDK
     }
