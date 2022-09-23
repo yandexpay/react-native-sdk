@@ -1,7 +1,23 @@
 {
   "name": "@yandex-pay/react-native-sdk",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "description": "Yandex Pay React Native sdk",
+  "keywords": [
+    "react-native",
+    "ios",
+    "android"
+  ],
+  "repository": "https://yandex.ru",
+  "author": "Yandex Pay Team <pay@yandex-team.ru>",
+  "license": "PROPRIETARY",
+  "bugs": {
+    "url": "https://yandex.ru/issues"
+  },
+  "homepage": "https://pay.yandex.ru/docs",
+  "publishConfig": {
+    "access": "public",
+    "registry": "https://registry.npmjs.org/"
+  },
   "main": "lib/commonjs/index",
   "module": "lib/module/index",
   "types": "lib/typescript/index.d.ts",
@@ -30,18 +46,6 @@
     "example": "yarn --cwd example",
     "bootstrap": "yarn example && yarn && yarn example pods"
   },
-  "keywords": [
-    "react-native",
-    "ios",
-    "android"
-  ],
-  "repository": "https://yandex.ru",
-  "author": "TODO_auth <TODO@yandex.ru> (https://yandex.ru)",
-  "license": "PROPRIETARY",
-  "bugs": {
-    "url": "https://yandex.ru/issues"
-  },
-  "homepage": "https://yandex.ru#readme",
   "devDependencies": {
     "@arkweid/lefthook": "^0.7.7",
     "@babel/eslint-parser": "^7.18.2",
@@ -99,10 +103,6 @@
         "preset": "angular"
       }
     }
-  },
-  "publishConfig": {
-    "access": "public",
-    "registry": "https://registry.npmjs.org/"
   },
   "eslintConfig": {
     "root": true,
