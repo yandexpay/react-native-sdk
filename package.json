@@ -7,13 +7,10 @@
     "ios",
     "android"
   ],
-  "repository": "https://yandex.ru",
+  "homepage": "https://pay.yandex.ru/docs",
+  "repository": "https://github.com/yandexpay/react-native-sdk",
   "author": "Yandex Pay Team <pay@yandex-team.ru>",
   "license": "PROPRIETARY",
-  "bugs": {
-    "url": "https://yandex.ru/issues"
-  },
-  "homepage": "https://pay.yandex.ru/docs",
   "publishConfig": {
     "access": "public",
     "registry": "https://registry.npmjs.org/"
