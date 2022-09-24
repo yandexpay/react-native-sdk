@@ -44,7 +44,7 @@ class YandexPayCheckoutButtonView: UIView, YandexPayCheckoutButtonDelegate {
 
     var theme: ButtonTheme = .dark {
         didSet {
-//             guard theme != oldValue else { return }
+            guard theme != oldValue else { return }
             payButton.setTheme(theme.toSDK.toTheme, animated: false)
         }
     }
